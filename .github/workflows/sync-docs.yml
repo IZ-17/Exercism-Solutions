@@ -24,8 +24,7 @@ jobs:
         run: |
           python -c '
           import os, requests
-          track = "python"
-          base_dir = os.path.join("solutions", track)
+          base_dir = os.path.join("solutions", "python")
           updated = False
           
           if os.path.exists(base_dir):
@@ -34,12 +33,13 @@ jobs:
                   if os.path.isdir(folder_path) and not folder.startswith("."):
                       readme_path = os.path.join(folder_path, "README.md")
                       if not os.path.exists(readme_path):
-                          url = f"https://githubusercontent.com{track}/main/exercises/practice/{folder}/.docs/instructions.md"
+                          # Используем обычную склейку строк во избежание проблем с парсингом слэшей
+                          url = "https://githubusercontent.com" + folder + "/.docs/instructions.md"
                           res = requests.get(url)
                           if res.status_code == 200:
                               with open(readme_path, "w", encoding="utf-8") as f:
                                   f.write(res.text)
-                              print(f"Downloaded README for {folder}")
+                              print("Downloaded README for " + folder)
                               updated = True
           
           if updated:
