@@ -1,0 +1,60 @@
+name: Sync Exercise Descriptions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  download-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch missing READMEs
+        run: |
+          python -c '
+          import os, requests
+          track = "python"
+          base_dir = os.path.join("solutions", track)
+          updated = False
+          
+          if os.path.exists(base_dir):
+              for folder in os.listdir(base_dir):
+                  folder_path = os.path.join(base_dir, folder)
+                  if os.path.isdir(folder_path) and not folder.startswith("."):
+                      readme_path = os.path.join(folder_path, "README.md")
+                      if not os.path.exists(readme_path):
+                          url = f"https://githubusercontent.com{track}/main/exercises/practice/{folder}/.docs/instructions.md"
+                          res = requests.get(url)
+                          if res.status_code == 200:
+                              with open(readme_path, "w", encoding="utf-8") as f:
+                                  f.write(res.text)
+                              print(f"Downloaded README for {folder}")
+                              updated = True
+          
+          if updated:
+              with open("sync_trigger.txt", "w") as f: f.write("updated")
+          '
+
+      - name: Commit and Push changes
+        run: |
+          if [ -f sync_trigger.txt ]; then
+            rm sync_trigger.txt
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@://github.com"
+            git add .
+            git commit -m "docs: auto-sync descriptions for exercises [skip ci]"
+            git push
+          else
+            echo "No missing descriptions found."
+          fi
