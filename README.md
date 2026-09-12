@@ -8,5 +8,6 @@ This repository automatically stores my solutions to programming exercises from 
 
 ## 🛠️ Project Info
 * **Platform:** [Exercism.org](https://exercism.org)
+* **My profile:** [IZ-17](https://exercism.org/profiles/IZ-17)
 * **Goal:** Master language syntax, learn idiomatic code practices, and improve problem-solving skills.
 * **Automation:** New exercises are automatically backed up and synced to this repository as soon as they are marked as *Complete* on the website.
